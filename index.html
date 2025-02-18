@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculate Moyen</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl mx-4">
+    <h1 class="text-2xl font-bold text-center mb-4">Calculate Moyen</h1>
+    <div class="flex justify-center space-x-2 mb-4">
+      <button onclick="renderSubjects('S1')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">S1</button>
+      <button onclick="renderSubjects('S2')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">S2</button>
+      <button onclick="renderSubjects('S3')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">S3</button>
+      <button onclick="renderSubjects('S4')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">S4</button>
+      <button onclick="renderSubjects('S5')" class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">S5</button>
+    </div>
+    <div id="subjects-container" class="mb-4 grid grid-cols-2 gap-2">
+    </div>
+    <button onclick="calculateMoyen()" class="w-full bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Calculate Moyen</button>
+    <div id="result" class="mt-4 text-center text-xl font-semibold">
+    </div>
+  </div>
+
+  <script>
+    const subjectsData = {
+      S1: [
+        { name: "Analyse Hilbertienne et calcul intégral", coefficient: 2 },
+        { name: "Probabilité et Processus Stochastiques ", coefficient: 2 },
+        { name: "Théorie des ensembles et arithmétique ", coefficient: 2 },
+        { name: "Semi-conducteurs ", coefficient: 2 },
+        { name: "Microprocesseurs et Interfaces ", coefficient: 2 },
+        { name: "Théorie des graphes", coefficient: 2 },
+        { name: "Programmation Java", coefficient: 2 },
+        { name: "Communications numériques", coefficient: 2 },
+        { name: "Technical English writing", coefficient: 1 },
+        { name: "Français ", coefficient: 1 }
+      ],
+      S2: [
+        { name: "Maths pour l'ingénieur ", coefficient: 2 },
+        { name: "Mathématiques discrètes", coefficient: 2 },
+        { name: "Physique de capteurs", coefficient: 2 },
+        { name: "Théorie de files d'attente", coefficient: 2 },
+        { name: "Programmation XML", coefficient: 2 },
+        { name: "Modélisation UML", coefficient: 2 },
+        { name: "Réseaux sans fil", coefficient: 2 },
+        { name: "Protocoles internet", coefficient: 2 },
+        { name: "Traitement de données", coefficient: 1 },
+        { name: "Technical English writing 2", coefficient: 1 },
+        { name: "Français 2", coefficient: 1 }
+      ],
+      S3: [
+        { name: "Antennes et hyperfréquences ", coefficient: 2 },
+        { name: "Evaluation de performance ", coefficient: 1 },
+        { name: "Recherche opérationnelle et optimisation combinatoire", coefficient: 2 },
+        { name: "Analyse numérique", coefficient: 1 },
+        { name: "Théorie des langages et automates", coefficient: 2 },
+        { name: "Algorithmique avancée", coefficient: 2 },
+        { name: "Systèmes d’exploitation avancés", coefficient: 2 },
+        { name: "Systèmes d’information ", coefficient: 1 },
+        { name: "Théorie de l'information et de la communication", coefficient: 2 },
+        { name: "Réseaux de télécoms", coefficient: 2 },
+        { name: "English Presentation", coefficient: 1 },
+        { name: "Technique d’expression", coefficient: 1 }
+      ],
+      S4: [
+        { name: "RFID", coefficient: 2 },
+        { name: "Spécification et vérification formelle", coefficient: 2 },
+        { name: "Compilation", coefficient: 1 },
+        { name: "Administration et sécurité des Base de données", coefficient: 2 },
+        { name: "Administration et sécurité des réseaux", coefficient: 2 },
+        { name: "Cloud Computing et virtualisation ", coefficient: 2 },
+        { name: "Développement mobile ", coefficient: 1 },
+        { name: "English Presentation", coefficient: 1 },
+        { name: "Technique d’expression ", coefficient: 1 },
+        { name: "C2i ", coefficient: 1 },
+        { name: "Entrepreneuriat et Business plan 1  ", coefficient: 1 },
+      ],
+      S5: [
+        { name: "Objets Connectés IoT", coefficient: 1 },
+        { name: "Réseaux 3G/4G", coefficient: 1 },
+        { name: "Réseaux NGN et tout IP ", coefficient: 1 },
+        { name: "Atelier Administration des réseaux", coefficient: 2 },
+        { name: "Base de données avancée", coefficient: 1 },
+        { name: "Fouille de données", coefficient: 1 },
+        { name: "Vision par ordinateur ", coefficient: 2 },
+        { name: "Web sémantique", coefficient: 1 },
+        { name: "Projet tutoré : développement GL ", coefficient: 1 },
+        { name: "Projet tutoré : IA pour l'ingénieur", coefficient: 2 },
+        { name: "English training ", coefficient: 1 },
+        { name: "Technique d’expression ", coefficient: 1 },
+        { name: "Entrepreneuriat et Business plan 2  ", coefficient: 1 }
+      ]
+    };
+
+    let currentSemester = null;
+
+    function renderSubjects(semester) {
+      currentSemester = semester;
+      const container = document.getElementById('subjects-container');
+      container.innerHTML = ''; 
+
+      subjectsData[semester].forEach((subject, index) => {
+        const subjectDiv = document.createElement('div');
+        subjectDiv.className = 'bg-gray-50 p-2 rounded-lg';
+        subjectDiv.innerHTML = `
+          <label class="block text-gray-700 text-sm font-semibold">${subject.name} (Coeff: ${subject.coefficient})</label>
+          <input type="number" step="0.01" min="0" max="20" class="w-full px-2 py-1 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Grade (0-20)">
+        `;
+        container.appendChild(subjectDiv);
+      });
+    }
+
+    function calculateMoyen() {
+      const inputs = document.querySelectorAll('#subjects-container input');
+      let isValid = true;
+      let totalWeightedSum = 0;
+      let totalCoefficients = 0;
+
+      inputs.forEach((input, index) => {
+        const value = parseFloat(input.value);
+        const coefficient = subjectsData[currentSemester][index].coefficient;
+
+        if (isNaN(value) || value < 0 || value > 20) {
+          isValid = false;
+          input.classList.add('border-red-500'); 
+        } else {
+          input.classList.remove('border-red-500');
+          totalWeightedSum += value * coefficient;
+          totalCoefficients += coefficient;
+        }
+      });
+
+      if (!isValid) {
+        alert('Please enter valid grades between 0 and 20.');
+        return;
+      }
+
+      const moyen = totalWeightedSum / totalCoefficients;
+      document.getElementById('result').innerText = `Moyen: ${moyen.toFixed(2)}`;
+    }
+
+    window.onload = () => renderSubjects('S1');
+  </script>
+</body>
+</html>
